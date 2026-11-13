@@ -1,3 +1,4 @@
+import type { Manifest } from "../types.js";
 import { existsSync, readFileSync } from "node:fs";
 import type { PermissionResult } from "@anthropic-ai/claude-agent-sdk";
 import { guard } from "../judge/guard.js";
@@ -14,6 +15,8 @@ export interface SupervisorDeps {
   notify: (title: string, body: string) => void | Promise<void>;
   log: (entry: Record<string, unknown>) => void;
   maxJudgeCalls?: number;           // decision 11: 15 per task
+  /** Returns a fresh manifest when Kin has saved the task file during the run (for example to fill in commit paths after the plan), else null. */
+  reloadManifest?: () => Manifest | null;
 }
 
 const clip = (s: string, n: number) => (s.length > n ? s.slice(0, n) + "…" : s);
@@ -36,6 +39,7 @@ export class Supervisor {
   private failures = new Map<string, number>();
   private idToSig = new Map<string, string>();
   private frustrated = false;
+  private stats = { rule: 0, judge: 0, human: 0, denied: 0, ran: 0, started: Date.now() };
   private written = new Map<string, string>();   // what the worker wrote to each file, so the judge can read it
 
   constructor(private d: SupervisorDeps) {}
@@ -51,7 +55,13 @@ export class Supervisor {
    */
   observeRan(command: string) {
     this.d.policy.observe(command);
+    this.stats.ran++;
     this.d.log({ t: new Date().toISOString(), ran: clip(command, 160) });
+  }
+  /** What this run cost in attention, for the Notes column of the §12 row. */
+  summary() {
+    const mins = Math.round((Date.now() - this.stats.started) / 60000);
+    return { minutes: mins, ruleApproved: this.stats.rule, judgeDecided: this.stats.judge, askedYou: this.stats.human, denied: this.stats.denied, commandsRun: this.stats.ran, judgeCalls: this.judgeCalls };
   }
   /** Short log line for every tool call the worker makes, so the judge knows what has been done. */
   noteToolUse(name: string, input: Record<string, unknown>) {
@@ -82,12 +92,16 @@ export class Supervisor {
   /** Pass this to the SDK as `canUseTool`. */
   canUseTool = async (toolName: string, input: Record<string, unknown>, opts: { toolUseID?: string } = {}): Promise<PermissionResult> => {
     const call: ToolCall = { tool: toolName, input };
+    const fresh = this.d.reloadManifest?.();
+    if (fresh) { this.d.policy.manifest = fresh; this.d.log({ t: new Date().toISOString(), manifest: "reloaded" }); }
     if ((toolName === "Write" || toolName === "Edit") && typeof input.file_path === "string") this.written.set(input.file_path, String(input.content ?? input.new_string ?? "").slice(0, 8000));
     const sig = signature(call);
     if (opts.toolUseID) this.idToSig.set(opts.toolUseID, sig);
     const t0 = Date.now();
     const done = (r: PermissionResult, via: string, why: string) => {
       this.d.log({ t: new Date().toISOString(), tool: toolName, input: summary(call), via, outcome: r.behavior, why, ms: Date.now() - t0 });
+      if (via === "rule") this.stats.rule++; else if (via === "judge") this.stats.judge++; else this.stats.human++;
+      if (r.behavior === "deny") this.stats.denied++;
       // A command the judge or Kin approved still happens, so staging and commit bookkeeping must see it.
       // (Rule-approved commands are already counted by the rule engine.)
       if (r.behavior === "allow" && toolName === "Bash" && via !== "rule") this.d.policy.observe(String(input.command ?? ""));

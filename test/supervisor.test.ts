@@ -197,3 +197,28 @@ test("what Kin answers at a question card is shown to the judge on later calls",
   await sup.canUseTool("ExitPlanMode", { plan: "p" });
   assert.match(calls.judge[1], /KIN RULED: Which side does thing_path use\? → Derive side/);
 });
+
+test("the run summary counts who decided what", async () => {
+  const { sup } = setup([J({ decision: "continue", reply: "ok", why: "w" })]);
+  await sup.canUseTool("Bash", { command: "git status" });
+  await sup.canUseTool("ExitPlanMode", { plan: "p" });
+  sup.observeRan("git status");
+  const s = sup.summary();
+  assert.equal(s.ruleApproved, 1); assert.equal(s.judgeDecided, 1); assert.equal(s.askedYou, 0); assert.equal(s.commandsRun, 1); assert.equal(s.judgeCalls, 1);
+});
+
+test("a task file saved during the run takes effect on the next call (commit paths filled in after the plan)", async () => {
+  const m1 = parseManifest(`task: "9.9"\nedits: ["src/a.ts"]\ncommits:\n  - message: "9.9: a"\n    paths: []\n`);
+  const m2 = parseManifest(`task: "9.9"\nedits: ["src/a.ts"]\ncommits:\n  - message: "9.9: a"\n    paths: ["src/a.ts"]\n`);
+  const policy = new Policy(m1, config);
+  let next: typeof m2 | null = null;
+  const human: Human = { decide: async () => ({ kind: "approve" }), answer: async () => ({}), followUp: async () => null, say() {} };
+  const sup = new Supervisor({ policy, judge: { decide: async () => "", close() {} }, human, ctx: { contextFiles: [], playbookEntry: "" }, notify: () => {}, log: () => {}, reloadManifest: () => { const n = next; next = null; return n; } });
+  assert.notEqual((await sup.canUseTool("Bash", { command: "git add src/a.ts" })).behavior + "x", "x");
+  const before = policy.evaluate({ tool: "Bash", input: { command: "git add src/a.ts" } }).kind;
+  next = m2;
+  await sup.canUseTool("Bash", { command: "git status" });
+  const after = policy.evaluate({ tool: "Bash", input: { command: "git add src/a.ts" } }).kind;
+  assert.notEqual(before, "allow");
+  assert.equal(after, "allow");
+});

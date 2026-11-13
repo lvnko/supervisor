@@ -13,7 +13,8 @@
     "shadow:report": "tsx src/shadow-report.ts",
     "supervise": "tsx src/run.ts",
     "smoke": "tsx src/smoke.ts",
-    "eval:judge": "tsx src/eval-real.ts"
+    "eval:judge": "tsx src/eval-real.ts",
+    "log:summary": "tsx src/log-summary.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

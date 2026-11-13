@@ -1,6 +1,6 @@
 // npm run supervise -- <task.yaml> --repo <path-to-item-tracker> "<first message for the worker>"
 //   options: --model opus|sonnet (overrides the manifest)   --project item-tracker   --mode plan|default (default plan)   --prompt-file <file>   --allow-api-key
-import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { query } from "@anthropic-ai/claude-agent-sdk";
@@ -48,7 +48,19 @@ async function main() {
   const human = new TerminalHuman();
   const judgeDir = join(home, "logs", "judge-cwd"); mkdirSync(judgeDir, { recursive: true });
   const judge = new SdkJudge({ cwd: judgeDir });
-  const sup = new Supervisor({ policy, judge, human, ctx: loadRepoContext(repoAbs, manifest), notify, log });
+  let manifestStamp = statSync(taskFile).mtimeMs;
+  const reloadManifest = () => {
+    try {
+      const stamp = statSync(taskFile).mtimeMs;
+      if (stamp === manifestStamp) return null;
+      manifestStamp = stamp;
+      const m = loadManifest(taskFile);
+      if (m.task !== manifest.task) throw new Error("task id changed");
+      console.log(`\n  (the task file ${taskFile} changed on disk: using the new version from now on)`);
+      return m;
+    } catch (e) { console.log(`\n  (could not reload ${taskFile}: ${(e as Error).message}. Keeping the version loaded at the start.)`); return null; }
+  };
+  const sup = new Supervisor({ policy, judge, human, ctx: loadRepoContext(repoAbs, manifest), notify, log, reloadManifest });
 
   const abort = new AbortController();
   const deadline = setTimeout(() => { console.log(`\n${HOURS} hours reached: stopping.`); abort.abort(); }, HOURS * 3600_000);
@@ -92,6 +104,9 @@ async function main() {
     }
   } finally {
     clearTimeout(deadline);
+    const sm = sup.summary();
+    log({ t: new Date().toISOString(), summary: sm });
+    console.log(`\nRun summary for ${manifest.task}: ${sm.minutes} min; ${sm.ruleApproved} approved by rules, ${sm.judgeDecided} decided by the judge (${sm.judgeCalls} judge calls), ${sm.askedYou} asked you, ${sm.denied} denied, ${sm.commandsRun} commands run.\nFor the §12 row: read /usage now, and put these numbers in the Notes column.`);
     saveState(stateFile, policy.state);
     judge.close(); human.close();
   }
