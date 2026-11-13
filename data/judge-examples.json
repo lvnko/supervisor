@@ -1,0 +1,362 @@
+[
+  {
+    "id": 1, "session": "fd707ea3", "date": "2026-10-23", "category": "B",
+    "question": "REPO-SETUP.md isn't anywhere in the repo (only prompts/02 mentions it). How should I treat the \"3. Using it in the app → Then:\" steps? [Use your steps 1–5 (Recommended) / I'll add the file first]",
+    "context": "Design-system setup; the prompt referenced a file that wasn't in the repo.",
+    "reply": "Better use my steps 1-5, while I can still provide you the REPO-SETUP.md file, I just have to keep you noticed that the list I gave you is a later version than REPO-SETUP.",
+    "derivable": "partly: the prompt spelled out the steps in full, but that they were newer than the missing file came only from Kin",
+    "risk": "low",
+    "recommended_handling": "auto-answer-then-notify"
+  },
+  {
+    "id": 2, "session": "fd707ea3", "date": "2026-10-23", "category": "C",
+    "question": "design/components.css line 1 has its own Google Fonts @import (no JetBrains Mono 500). I can't edit design/, so the fonts would load twice. What should I do? [Accept it, flag it (Recommended) / Skip the head links]",
+    "context": "Design-system setup; the generated design/ can't be edited by hand.",
+    "reply": "Accept it, flag it (Recommended)",
+    "derivable": "yes: CLAUDE.md forbids editing design/, and the prompt asked for head links, so flagging is the only consistent choice",
+    "risk": "low",
+    "recommended_handling": "auto-answer"
+  },
+  {
+    "id": 3, "session": "fd707ea3", "date": "2026-10-23", "category": "C",
+    "question": "Group B report: Select's clear (×) isn't in the preview; NoteItem composer has no preview markup; tag cloud and tag remove not in any preview; DataTable README wants nw columns but preview doesn't. Tell me when to start Group C, and whether to build the composer from the CSS or skip it.",
+    "context": "Building UI components group by group, with mismatches between README and preview.",
+    "reply": "General rule from now on: when a preview doesn't show something, search the screens before building from the CSS… If a README and a preview disagree, the preview decides the markup, and the README decides behaviour and rules… Write each gap into docs/design-gaps.md. [then 8 specific decisions, e.g. Composer: build it in Group C from I2-M_Item-detail-team and B8-I2-OW_Item-owner; DataTable: the README wins]",
+    "derivable": "no: Kin created the precedence rule here; now it exists, and later cases are derivable",
+    "risk": "medium",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 4, "session": "fd707ea3", "date": "2026-10-23", "category": "C",
+    "question": "FRS question: who may press Start is left to the page. TaskCard shows Start to whoever the page passes as viewer=\"team\", so the page has to apply the FRS rule.",
+    "context": "Group C report on TaskCard; a permission rule hidden inside a UI component.",
+    "reply": "You're right that the page decides. Make it explicit. TaskCard shouldn't infer actions from viewer alone. Add a permissions prop (e.g. { canStart, canRecord, canWithdraw }) that the page fills from the FRS rules later, all false by default.",
+    "derivable": "partly: CLAUDE.md rule 5 (permissions live in the DB; the UI only hides) points there, but the prop shape is Kin's",
+    "risk": "medium",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 5, "session": "fd707ea3", "date": "2026-10-23", "category": "B",
+    "question": "The file has the time you gave, plus a timezone and a second line: 'design/ built 2026-10-23 14:37 (São Paulo time) / Checked: 15 promises in CHANGES.md'. If this is the build you meant, say so and I'll run the comparison and commit.",
+    "context": "Kin said: check design/VERSION reads X; if it doesn't, stop and tell me.",
+    "reply": "Yes, that's the build I meant. I only quoted the start of the first line. The timezone and the \"Checked: 15 promises\" line are part of it. Go ahead.",
+    "derivable": "partly: the expected text was a prefix of the real one, and everything else in the build matched the description",
+    "risk": "low",
+    "recommended_handling": "auto-answer-then-notify"
+  },
+  {
+    "id": 6, "session": "e87adc50", "date": "2026-10-23", "category": "B",
+    "question": "TRS §16 Q11: What does an owner's Viewer see? I suggest all of the owner's items, with tags but no notes.",
+    "context": "TRS open questions, product rules for roles.",
+    "reply": "Owner's Viewer: not all items. Only the items the owner shares with that Viewer (the owner picks all or specific items; P4 shows \"<persona> · 3 items shared\"). Read-only, sees owner-side tags the owner allows, no notes (FRS 4.2), no tasks. FRS 3.4 already says \"the owned items shared\".",
+    "derivable": "partly: FRS 3.4 already said \"the owned items shared\", so the recommendation contradicted the FRS; the rest was new",
+    "risk": "high",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 7, "session": "e87adc50", "date": "2026-10-23", "category": "B",
+    "question": "TRS §16 Q12: Traditional Chinese at launch? I suggest English first, built ready for translation.",
+    "context": "TRS open questions.",
+    "reply": "English at launch, built ready for translation includes: Traditional Chinese and Portuguese (all copy in message files, 30% width slack). The Language setting in X3 shows only English until 繁中 is added.",
+    "derivable": "no: Portuguese and the X3 behaviour were new product decisions",
+    "risk": "medium",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 8, "session": "e87adc50", "date": "2026-10-23", "category": "C",
+    "question": "O54 vs O72 (FRS 3.1): O54 says every new team starts on Free, and O72 says one Free team per person… Tell me which you want, and whether O54 or O72 should say so.",
+    "context": "Checking the TRS against an updated FRS; Claude found a contradiction inside the FRS.",
+    "reply": "Good catch. Keep what the TRS does (the second team is created on Free and I'm notified), and make the FRS say so. [exact replacement sentences for 3.1 and 8.2] Leave O54 as it is.",
+    "derivable": "no: a product rule plus Kin's exact wording",
+    "risk": "medium",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 9, "session": "111b4955", "date": "2026-10-24", "category": "C",
+    "question": "ds-compare: Combobox differs in its demo labels… I didn't change any component files, so the difference came from earlier work. Should I fix the demo page so its labels match the preview?",
+    "context": "Build playbook session; re-running the design comparison.",
+    "reply": "No, leave the Combobox demo labels as they are; that difference was accepted earlier.",
+    "derivable": "yes: docs/design-gaps.md records the Combobox label difference as accepted",
+    "risk": "low",
+    "recommended_handling": "auto-answer"
+  },
+  {
+    "id": 10, "session": "111b4955", "date": "2026-10-24", "category": "B",
+    "question": "Supabase CLI: it isn't installed (not on the PATH, not in node_modules). Install it, or tell me to use npx supabase. CI: confirm GitHub Actions on <gh-owner>/item-tracker.",
+    "context": "Open items listed at the end of the build playbook.",
+    "reply": "Supabase CLI: install it as a dev dependency (npm i -D supabase, run with npx supabase) as part of task 0.4, so I don't need a global install. CI: yes, GitHub Actions on <gh-owner>/item-tracker.",
+    "derivable": "partly: the repo already pointed at GitHub; the devDependency choice was Kin's preference",
+    "risk": "low",
+    "recommended_handling": "auto-answer-then-notify"
+  },
+  {
+    "id": 11, "session": "111b4955", "date": "2026-10-24", "category": "D",
+    "question": "What I need from you: before 0.5, create the Supabase project(s) and the Netlify site linked to <gh-owner>/item-tracker. Before 2.5: a Google OAuth client. Before 5.12: the Resend test domain…",
+    "context": "Playbook open items that need accounts.",
+    "reply": "(Done later by Kin in dashboards; the plan changed in between: one project → Supabase Branching → two separate projects on two accounts.)",
+    "derivable": "no: needs accounts and credentials",
+    "risk": "high",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 12, "session": "d4d25f55", "date": "2026-10-27", "category": "A",
+    "question": "public/assets/dashboard/ contains an untracked .DS_Store (git can't recover it). May I remove public/assets/dashboard/ with the .DS_Store inside it? I'd git rm the 17 tracked files, then remove the leftover .DS_Store and the empty folder.",
+    "context": "0.1 deletion; Kin had said: if any file is untracked, stop and tell me.",
+    "reply": "Good catch, thanks. Yes: remove public/assets/dashboard/ including the .DS_Store inside it. Use git rm for the 17 tracked files, then delete the leftover .DS_Store and the empty folder. Keep the pre-cleanup tag. Push it to origin (git push origin pre-cleanup)…",
+    "derivable": "partly: a .DS_Store is obviously junk, but Kin had set an explicit stop condition on untracked files",
+    "risk": "medium",
+    "recommended_handling": "auto-answer-then-notify"
+  },
+  {
+    "id": 13, "session": "d4d25f55", "date": "2026-10-27", "category": "C",
+    "question": "The build fails: with the posts and add-location routes gone, _authed.tsx is a pathless layout with no children… [Move loginFn, delete _authed.tsx (Recommended) / Keep file, rename route / Drop the index redirect]",
+    "context": "0.1 demo-code removal; the approved deletion list caused a build break.",
+    "reply": "Go with option 1… Keep it a pure move. Copy loginFn exactly as it is, with no behaviour change and no fix for the known email/password cookie gap (G1). That belongs to 2.1 and 2.3… grep for every import or reference… record this as a deviation from the approved list: mention it in the 0.1 commit message.",
+    "derivable": "partly: the recommended option was right; the 'pure move + record deviation' conditions are Kin's standing pattern",
+    "risk": "medium",
+    "recommended_handling": "auto-answer-then-notify"
+  },
+  {
+    "id": 14, "session": "d4d25f55", "date": "2026-10-27", "category": "C",
+    "question": "Approve this list, and tell me whether to delete supabase/snippets.",
+    "context": "0.1 plan, with a deletion list.",
+    "reply": "supabase/snippets: leave it alone. Don't delete it in 0.1. Task 0.4 handles it.",
+    "derivable": "yes: the playbook assigns supabase/snippets to task 0.4",
+    "risk": "medium",
+    "recommended_handling": "auto-answer"
+  },
+  {
+    "id": 15, "session": "ed0c70d1", "date": "2026-10-27", "category": "A",
+    "question": "(auto-mode classifier denied `git add docs/… && git commit -m \"docs: 0.2 version floors\"` and a python3 heredoc edit of the playbook) … I need your answer, and permission to run git commit, before I go further.",
+    "context": "0.2 tooling; the docs-first commit was blocked by the classifier, not by Kin.",
+    "reply": "The permission prompt for git commit will appear; I will approve it. If it is denied again, stop and tell me, don't work around it.",
+    "derivable": "partly: Kin had asked for that exact commit; the classifier's denial was not a human decision",
+    "risk": "low",
+    "recommended_handling": "auto-answer-then-notify"
+  },
+  {
+    "id": 16, "session": "ed0c70d1", "date": "2026-10-27", "category": "C",
+    "question": "How should I proceed? 1. Move to vite 8 along with the TanStack bump. 2. Stay on vite 7, use the newest react-start that allows vite 7, drop ssr-query. 3. Keep the TanStack versions as installed and move the bump to 2.1. I recommend option 2 or 3.",
+    "context": "0.2: the approved TanStack bump turned out to need vite 8.",
+    "reply": "Good stop, thanks. Decision: option 3, with a check. Stay on vite 7 and on the installed TanStack versions in this task. The TanStack bump, react-router-ssr-query and any vite 8 move are NOT part of 0.2; they get decided at 2.1. Docs first… revert the pins.",
+    "derivable": "partly: 'defer upgrades to the task that needs them' is consistent, but the decision reversed an earlier approval",
+    "risk": "high",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 17, "session": "ed0c70d1", "date": "2026-10-28", "category": "F",
+    "question": "(tool call) npx simple-git-hooks; git add -A && git status --short; … time sh .git/hooks/pre-commit",
+    "context": "0.2: timing the pre-commit hook.",
+    "reply": "Don't use git add -A. Stage only the files that belong to the 0.2 tooling commit, by name, then show me `git status --short`… Afterwards run `git restore --staged .`… don't use --no-verify.",
+    "derivable": "partly: the system prompt's git guidance already prefers named staging; it became an explicit rule here",
+    "risk": "medium",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 18, "session": "ed0c70d1", "date": "2026-10-28", "category": "F",
+    "question": "(tool call) npm install 2>&1 | grep …; npm ls …; npm run lint …",
+    "context": "0.2: Claude chained a bare npm install with checks.",
+    "reply": "Don't run a bare `npm install`. First tell me in 3 lines: why you need it, what changed in package.json or package-lock.json that requires it, and show `git diff --stat`… Then run the checks as separate commands, not one chain.",
+    "derivable": "partly: earlier in the session Kin required dry runs before installs",
+    "risk": "medium",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 19, "session": "ed0c70d1", "date": "2026-10-28", "category": "C",
+    "question": "What I need from you: 1. Approve or change the `ui` override above [src/components/ui/** turning off four React-hooks rules]. 2. Start npm run dev and npx serve design -l 4100 for ds:compare.",
+    "context": "0.2: the new ESLint rules flag 17 hits in the frozen design-system components.",
+    "reply": "ui lint hits: don't use a src/components/ui/** override… add a per-file override listing only the 7 files with hits, each turning off only the exact rules it hits, with a comment: \"design-system code, frozen; revisit when ui is next edited (Overlay: task 8.3)\". New files in src/components/ui stay fully linted.",
+    "derivable": "partly: 'narrowest exemption' and 'no blanket disables' showed in earlier prompts, but the comment text is Kin's",
+    "risk": "low",
+    "recommended_handling": "auto-answer-then-notify"
+  },
+  {
+    "id": 20, "session": "ed0c70d1", "date": "2026-10-28", "category": "F",
+    "question": "(final report) I also stopped a `vite dev` earlier with `pkill` before you started your own servers, so nothing of yours was affected.",
+    "context": "0.2 report; Claude disclosed it had killed a process.",
+    "reply": "The pkill: confirm you will not use `pkill` or kill any dev server in later tasks (I run `npm run dev` and `npx serve design -l 4100` myself). Don't edit CLAUDE.md. Give me one line of wording I could add to it.",
+    "derivable": "no: a new rule (it is still only in the parking lot, not in CLAUDE.md)",
+    "risk": "high",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 21, "session": "ed0c70d1", "date": "2026-10-28", "category": "F",
+    "question": "(tool call) npm run ds:compare 2>&1 | tail -30; echo \"ds:compare exit: ${pipestatus[1]}\"",
+    "context": "0.2: Claude went on to ds:compare while a lint-globals question was still open.",
+    "reply": "[Request interrupted by user] Hold ds:compare for a moment. The document count was 1 for src/utils/cx.ts. Is that from a general browser-globals block for src/** (intended…), or from the ds-compare override leaking? Show me the globals sections of eslint.config.js…",
+    "derivable": "no: Kin spotted an anomaly in Claude's own output that Claude had passed over",
+    "risk": "low",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 22, "session": "b16023df", "date": "2026-10-28", "category": "B",
+    "question": "The sources word the Dispose task two ways: ui-blueprint R3 says \"Dispose of it\"; ui-blueprint §9 (⋯ menu) says \"Dispose of item\"; layout.md lists both. How should I seed it? [Two keys / Only \"Dispose of it\" / Only \"Dispose of item\"]",
+    "context": "0.3 message files; Kin had said: copy conflicts, don't pick one, ask me.",
+    "reply": "Two keys, one per context",
+    "derivable": "partly: both strings are sourced, so 'two keys' keeps both, but Kin explicitly reserved copy conflicts for themself",
+    "risk": "low",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 23, "session": "b16023df", "date": "2026-10-28", "category": "C",
+    "question": "(plan) JSX-literal lint selectors: JSXExpressionContainer > Literal …; attribute list; key table; package.json change; Intl helpers; banned-word test incl. Location…",
+    "context": "0.3 plan review; a detailed technical plan.",
+    "reply": "Don't change anything yet. Revise the plan only. 1. Lint selectors… must apply only to element or fragment children, not attribute values… As written they flag className={'it-btn'}… 4. package.json: remove it from the 'Change' list… 7. Banned-word test… [then a second round:] remove `Location` from the automated list. A whole-word test would break on the legitimate \"Location description\" field label (FRS 1.4).",
+    "derivable": "partly: the FRS and READMEs contained the facts behind most points; spotting them takes deep technical review",
+    "risk": "medium",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 24, "session": "515698f1", "date": "2026-10-28", "category": "A",
+    "question": "(tool call) npm i -D supabase @netlify/vite-plugin-tanstack-start",
+    "context": "0.4: installing the two packages from the Build line.",
+    "reply": "Don't install yet. First, for each of the two packages, run `npm view <pkg> version peerDependencies` and paste the result. Check the Netlify plugin's peers against react-start 1.167.13, react-router 1.168.8 and vite 7.3.1… run `npm install --dry-run`… Never use --force or --legacy-peer-deps.",
+    "derivable": "yes: the same procedure was required in 0.2 (session ed0c70d1)",
+    "risk": "medium",
+    "recommended_handling": "auto-answer-then-notify"
+  },
+  {
+    "id": 25, "session": "515698f1", "date": "2026-10-28", "category": "A",
+    "question": "Can I run the real install, `npm i -D supabase@2.121.0 @netlify/vite-plugin-tanstack-start@1.3.19`? [dry run: no TanStack, vite or React version would change; 7 transitive bumps]",
+    "context": "0.4: after the dry run.",
+    "reply": "Approved: run the real install with exact versions, `npm i -D --save-exact …` (no ^). No --force or --legacy-peer-deps. Afterwards, as separate commands, show me: git diff --stat…, npm ls … to confirm the pins did not move…",
+    "derivable": "yes: the packages were on the Build line, and the dry run met every condition Kin had set",
+    "risk": "medium",
+    "recommended_handling": "auto-answer-then-notify"
+  },
+  {
+    "id": 26, "session": "515698f1", "date": "2026-10-28", "category": "F",
+    "question": "(tool call) perl … over node_modules/@supabase/cli-darwin-arm64/bin/supabase-go searching for inbucket/orioledb_version strings",
+    "context": "0.4: checking config.toml key renames in the new CLI.",
+    "reply": "Stop the binary string searches. Give me a final answer in 6 lines max… What the CLI does with an old key name, if you know; if you can't tell, say so plainly. Don't guess.",
+    "derivable": "partly: the general 'use docs, don't spelunk' preference wasn't written down yet",
+    "risk": "low",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 27, "session": "515698f1", "date": "2026-10-28", "category": "C",
+    "question": "Decisions for you: 1. Approve the deletion list. 2. Approve the supabase/.temp/ change. 3. Choose whether the config.toml renames go before (my recommendation) or after the first start. 4. Approve writing the files.",
+    "context": "0.4 step A.",
+    "reply": "Approved, with conditions… Also untrack and ignore supabase/.branches/ the same way… config.toml: apply both renames BEFORE the first `npx supabase start`… Add one dated line (Oct 28) to docs/tech-review.md…",
+    "derivable": "partly: the deletion list matched the tech review's Delete rows and 'before' was the recommendation; the .branches extra was Kin's",
+    "risk": "high",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 28, "session": "515698f1", "date": "2026-10-28", "category": "A",
+    "question": "Can I run the local database steps? In order: npx supabase start, a storage.buckets query through docker exec … psql, npm run db:reset, the same query, npx supabase test db. I'll stop at the first error.",
+    "context": "0.4: Kin had pre-approved exactly this list in the plan amendment, but a later message said to wait for explicit approval.",
+    "reply": "Yes, run the local database steps now, in this order, stopping at the first error… (wipes my local database; confirmed nothing there is worth keeping)… Never use --linked, --db-url, link, db push…",
+    "derivable": "yes: the same five commands were pre-approved word for word in the plan amendment (though a later message added an explicit-approval gate)",
+    "risk": "high",
+    "recommended_handling": "auto-answer-then-notify"
+  },
+  {
+    "id": 29, "session": "515698f1", "date": "2026-10-29", "category": "D",
+    "question": "Both servers are running somewhere this session can't reach… Once both URLs answer from your terminal (curl -I …:3000/dev/components and curl -I …:4100), tell me and I'll re-run ds-compare.",
+    "context": "0.4: ds-compare needs Kin's dev server and design server.",
+    "reply": "Both servers are now actually running… Both curl -I checks return 200 from my terminal. Re-run… If it still can't connect, don't retry or start anything: tell me, and I'll run the script in my own terminal and paste the section lines back.",
+    "derivable": "no: only Kin controls those processes",
+    "risk": "low",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 30, "session": "515698f1", "date": "2026-10-29", "category": "E",
+    "question": "Staged for \"0.4: local Supabase, Netlify build, CI\", 20 paths: [list]. Waiting for your OK to commit. I won't tick the playbook and won't push.",
+    "context": "0.4 main commit.",
+    "reply": "The staged list matches (20 paths). Before I approve the commit, show me every ds-compare section line that is NOT \"markup matches · dark 0.00% · light 0.00%\" (expect only Combobox and StatTile)… If only those two differ, commit.",
+    "derivable": "yes: Kin had predicted 20 paths and the accepted differences are recorded in design-gaps.md",
+    "risk": "low",
+    "recommended_handling": "auto-answer-then-notify"
+  },
+  {
+    "id": 31, "session": "515698f1", "date": "2026-10-29", "category": "D",
+    "question": "Push build/phase-0 when you're ready so CI run #2 can confirm the Playwright install on 24.04.",
+    "context": "0.4: CI only runs after Kin pushes.",
+    "reply": "CI run #2 failed only at \"Run node scripts/ds-compare.mjs\"… page.evaluate: Execution context was destroyed… My hypothesis: on a cold CI runner, Vite's dev server optimizes dependencies on the first page load and force-reloads the page… Step 1, read-only… Step 2: propose the smallest fix, as a diff, and WAIT for my OK.",
+    "derivable": "no: needs a push and the CI result",
+    "risk": "medium",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 32, "session": "515698f1", "date": "2026-10-29", "category": "C",
+    "question": "A. Load netlify() only when command === 'build'. B. The documented option netlify({ dev: { edgeFunctions: { enabled: false } } }): one line, but the rest of the dev emulation keeps starting.",
+    "context": "0.4 CI run #3: the Netlify plugin's dev emulation crashed vite dev.",
+    "reply": "Approved: apply option A (netlify() only when command === 'build') to vite.config.ts, exactly as in your diff. No other file… Add to the final report: the plugin option dev.edgeFunctions.enabled = false exists (option B) if we ever need Netlify dev emulation again.",
+    "derivable": "yes: Kin had stated A as the preference unless a documented option existed, and asked to be told both",
+    "risk": "medium",
+    "recommended_handling": "auto-answer-then-notify"
+  },
+  {
+    "id": 33, "session": "8e613fda", "date": "2026-10-31", "category": "E",
+    "question": "I haven't changed the guide yet. Want me to rewrite step 2.5 with the screens and permissions above? I'd recommit it as a separate commit.",
+    "context": "0.5 setup guide; Kin found that the token 'Permissions' step was missing.",
+    "reply": "I trusted you to write me an up-to-date guidebook, and you put something outdated in it, can you make sure that everything is updated, DON'T WASTE MY TIME!!!!",
+    "derivable": "yes: of course the guide should be fixed; the question itself was the irritant",
+    "risk": "medium",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 34, "session": "8e613fda", "date": "2026-10-31", "category": "F",
+    "question": "(guide step 2.6/2.7) Required reviewers under Environments; 'Functions region' under Project configuration; Project settings › API keys under Project.",
+    "context": "0.5 setup guide for a non-technical reader; several steps didn't match the live dashboards.",
+    "reply": "there is no such thing as \"Project settings\" and \"API keys\" under the tab of \"Project\"… you are WASTING MY TIME. / …no such choice of selecting \"Required reviewers\" straight… are you giving me outdated guide again… / \"Functions region\", I cannot find it at any where.",
+    "derivable": "no: needed the current vendor UI; the steps had come from playbook wording and memory",
+    "risk": "high",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 35, "session": "8e613fda", "date": "2026-11-01", "category": "F",
+    "question": "If this is clear, I can reword sections 3 and 4 of docs/setup-guide-0.5.md so it says plainly that .env is local only and that hosted values never go in it. Want me to?",
+    "context": "Kin challenged putting prod and dev values in one .env, and asked whether the code would hard-code environment switches.",
+    "reply": "You still didn't answer my question, is it gonna be involve hard coding!? / …couldn't we do it really really in the normal dev practice, this is the dumbest approach I have ever seen...",
+    "derivable": "partly: the answer ('no; values come from each platform's env contexts') could be found in the code and TRS, but Claude never said it directly",
+    "risk": "medium",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 36, "session": "8e613fda", "date": "2026-10-31", "category": "C",
+    "question": "Three options [for production approval, since Required reviewers isn't available]: 1. Manual production deploy (my recommendation)… 2. Make the repository public… 3. GitHub Enterprise. Tell me which one, and I'll record it in the playbook.",
+    "context": "0.5: GitHub environment protection isn't available on a private free repo.",
+    "reply": "(Nov 2) Decision made: production deploys are MANUAL, with no approval gate… The production job in deploy.yml runs only by workflow_dispatch, only from main… update the docs now, docs only, in one commit.",
+    "derivable": "no: a production-safety and cost decision",
+    "risk": "high",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 37, "session": "8e613fda", "date": "2026-10-31", "category": "E",
+    "question": "The setup guide is written but not committed. Neither is the CLAUDE.md change. I haven't committed either, since you didn't ask me to.",
+    "context": "0.5 guide plus CLAUDE.md rule 10 (keep agents off main).",
+    "reply": "Can you commit these change then I will push",
+    "derivable": "partly: Kin expects finished doc work to be committed, but no message had been given",
+    "risk": "low",
+    "recommended_handling": "auto-answer-then-notify"
+  },
+  {
+    "id": 38, "session": "7dc3f75a", "date": "2026-11-02", "category": "A",
+    "question": "(denied by settings deny rules, 3 times, including after Kin approved it in the plan) npx supabase --version; npx supabase link --help; npx supabase db push --help …",
+    "context": "0.5: checking the pinned CLI's flags before writing deploy.yml.",
+    "reply": "(Plan amendment) Yes, run `npx supabase {link,db push,functions deploy,db reset} --help` locally (read-only, pinned version)… [the deny rules still blocked it; the report later said --yes and --db-url were verified only from the CLI reference]",
+    "derivable": "yes: read-only and approved, but the deny rules win; the supervisor can't override them",
+    "risk": "low",
+    "recommended_handling": "auto-answer-then-notify"
+  },
+  {
+    "id": 39, "session": "7dc3f75a", "date": "2026-11-02", "category": "D",
+    "question": "Run failed, log follows → I won't re-run or change anything until I've seen the log. [paste the failed step's lines, with tokens stripped]",
+    "context": "0.5: first deploy run on dev; Kin's message said a log followed but contained none.",
+    "reply": "Failed step: Deploy to item-tracker-dev › Push migrations… \"IPv6 is not supported on your current network\"… Session pooler host from the dev dashboard… Preferred: db push and migration list with --db-url, built in the workflow from the existing secrets… The password must never be echoed.",
+    "derivable": "no: only Kin can see the Actions log",
+    "risk": "high",
+    "recommended_handling": "escalate"
+  },
+  {
+    "id": 40, "session": "7dc3f75a", "date": "2026-11-02", "category": "F",
+    "question": "(Claude closed 0.5 with the tick commit and a playbook note, without the operation-book log.)",
+    "context": "0.5 wrap-up.",
+    "reply": "You seems to have forgotten to update the \"Limit hit\" and \"Notes, decisions, changes to the plan\" columns at section 12 of docs/operation-strategy-book.md, please have a look to the attached screencap…",
+    "derivable": "yes: every earlier task (0.2, 0.3, 0.4) ended with a §12 log update",
+    "risk": "low",
+    "recommended_handling": "auto-answer"
+  }
+]

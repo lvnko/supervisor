@@ -1,0 +1,18 @@
+# Item Tracker: path rules for the supervisor. Globs are relative to the repo root.
+frozen:            # never edited by the agent
+  - "design/**"
+  - "src/components/ui/**"
+  - "src/dev/**"
+human_paths:       # Kin decides
+  - "CLAUDE.md"
+  - ".claude/**"
+  - ".env"
+  - ".env.*"
+judge_paths:       # judge decides unless the task manifest lists them
+  - "package.json"
+  - "package-lock.json"
+  - ".github/**"
+  - "vite.config.ts"
+  - "netlify.toml"
+  - "supabase/config.toml"
+scratch: []        # extra prefixes where `> file` redirection is harmless

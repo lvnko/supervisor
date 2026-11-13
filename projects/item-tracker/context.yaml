@@ -1,0 +1,7 @@
+# Files the judge reads for every decision (always) or on demand (reference).
+# Paths are read from the project repo, not copied.
+always:
+  - CLAUDE.md
+reference:
+  - docs/build-playbook.md
+  - docs/design-gaps.md

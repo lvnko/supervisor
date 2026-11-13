@@ -1,0 +1,13 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "*", "hooks": [ { "type": "command", "command": "cd /ABS/PATH/TO/supervisor && npx tsx src/hook-shadow.ts" } ] }
+    ],
+    "PermissionRequest": [
+      { "matcher": "*", "hooks": [ { "type": "command", "command": "cd /ABS/PATH/TO/supervisor && npx tsx src/hook-shadow.ts" } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "*", "hooks": [ { "type": "command", "command": "cd /ABS/PATH/TO/supervisor && npx tsx src/hook-shadow.ts" } ] }
+    ]
+  }
+}

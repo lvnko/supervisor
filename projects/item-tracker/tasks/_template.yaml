@@ -1,0 +1,63 @@
+# TEMPLATE for a task manifest. Copy to projects/item-tracker/tasks/<id>.yaml, one per playbook task.
+# Easiest start: npm run draft -- ../item-tracker/docs/build-playbook.md <id> --write
+# The draft fills most of this from the playbook; lines marked TODO need a person.
+#
+# How the supervisor uses this file:
+#   - Anything it can match here is approved automatically. Anything it can't match goes to the judge or to Kin.
+#   - Paths and commit messages must be EXACT. Narrow every glob once the plan names the real files.
+#   - `git add` is checked against the commit `paths` below, so there is no need for a git add rule in `preapproved`.
+#   - Frozen paths (design/, shells, ui/ components) and anything hosted are blocked by config.yaml, whatever this file says.
+
+task: "0.4"                 # the playbook task id, as a string
+
+model: "opus"               # the model the WORKER runs on: "opus" (database tasks) or "sonnet" (screen tasks).
+                            # Comes from the playbook's "Model" line. Override once with: --model sonnet|opus
+                            # The judge always runs on Sonnet, whatever this says.
+
+manual_setup: []            # things Kin must do BEFORE the run, e.g. "Local Supabase stack running (npx supabase start)"
+setup_done: true            # set to false while manual_setup is outstanding; the run refuses to start until it is true
+checkpoint_after: ""        # e.g. "Checkpoint 0 (§6)." A reminder shown when the task ends
+
+edits:                      # files the worker may edit (globs). Narrow to exact names after the plan.
+  - "src/i18n/**"
+  - "eslint.config.js"
+  # Include the docs the task changes and the ones it ticks: docs/build-playbook.md, docs/operation-strategy-book.md
+
+commits:                    # IN ORDER. The first line of the message must match exactly.
+  - message: "0.4: example change"
+    paths:                  # every file in this commit; `git add` of anything else is not auto-approved
+      - "src/i18n/en.ts"
+      - "eslint.config.js"
+  - message: "0.4: tick playbook"
+    paths: ["docs/build-playbook.md", "docs/operation-strategy-book.md"]
+  # TODO after the plan: if a commit has paths: [], fill it in BEFORE the first `git add`.
+  # Commits not listed here go to the judge.
+
+packages: []                # exact name@version the worker may install, e.g. "zod@4.6.1". Empty = no installs.
+deletions: []               # paths the worker may rm or git rm. Empty = no deletions.
+
+preapproved:                # regexes for WHOLE commands, approved without asking. Anchor each with ^ and $
+                            # so extra arguments (--linked, --include-seed, -A) can never match. They never override a hard block.
+  # Database tasks usually want these (npm run draft adds them for you):
+  # - "^npx supabase db reset$"
+  # - "^npx supabase test db$"
+  # - "^npm run db:test$"
+  # - "^npm run typecheck$"
+  # - "^npm run lint$"
+  # - "^npm test$"
+  # - "^curl -I http://127\\.0\\.0\\.1:54321$"
+  # - "^git status$"
+  # - "^git diff --cached --name-status$"
+  # - "^git diff( --stat)?( -- [A-Za-z0-9_./-]+)+$"
+  # Do NOT add a broad "git add" rule. Read-only local queries (npx supabase db query --local "select …") are already allowed by the rules.
+
+gates:                      # local-destructive steps this task allows. Write them WITHOUT "npx".
+  - "supabase db reset"
+  # - "supabase start"
+
+human_gates: []             # NOTES for Kin, NOT enforced by the supervisor: steps only a person can do, e.g.
+                            # "Before any commit: Kin approves the doc diffs", "Kin pastes Supabase dashboard values"
+
+context:                    # files the judge reads on every call, in addition to CLAUDE.md
+  always: ["CLAUDE.md"]
+  reference: []             # e.g. "docs/FRS.md", "docs/TRS.md", "docs/build-playbook.md"
